@@ -17,6 +17,8 @@ int main(int argc, char *argv[]) {
 
     switch (day) {
     case 1:
+        day_01(argv[2]);
+        break;
 
     default:
         if (day > 0 && day <= 25) {
