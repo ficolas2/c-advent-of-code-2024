@@ -1,9 +1,11 @@
 #include "day_01/day_01.h"
+#include "day_02/day_02.h"
 
 #include <cstdlib>
 #include <iostream>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[])
+{
     int day;
 
     if (argc < 2) {
@@ -18,6 +20,9 @@ int main(int argc, char *argv[]) {
     switch (day) {
     case 1:
         day_01(argv[2]);
+        break;
+    case 2:
+        day_02(argv[2]);
         break;
 
     default:
