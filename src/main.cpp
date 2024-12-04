@@ -1,5 +1,6 @@
 #include "day_01/day_01.h"
 #include "day_02/day_02.h"
+#include "day_03/day_03.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -23,6 +24,9 @@ int main(int argc, char* argv[])
         break;
     case 2:
         day_02(argv[2]);
+        break;
+    case 3:
+        day_03(argv[2]);
         break;
 
     default:
