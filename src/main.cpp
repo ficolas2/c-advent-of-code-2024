@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 
+void (*const days[])(const char*) = { day_01, day_02, day_03 };
+
 int main(int argc, char* argv[])
 {
     int day;
@@ -18,26 +20,18 @@ int main(int argc, char* argv[])
     }
     day = atoi(argv[1]);
 
-    switch (day) {
-    case 1:
-        day_01(argv[2]);
-        break;
-    case 2:
-        day_02(argv[2]);
-        break;
-    case 3:
-        day_03(argv[2]);
-        break;
+    if (day < 1 || day > 25) {
+        std::cout << "Invalid day. Day must be a number between 1 and 25"
+                  << std::endl;
+        return 1;
+    }
 
-    default:
-        if (day > 0 && day <= 25) {
-            std::cout << "Day " << day << " not implemented" << std::endl;
-        } else {
-            std::cout << "Invalid day. Day must be a number between 1 and 25"
-                      << std::endl;
-        }
-        break;
-    };
+    if (static_cast<int>(sizeof(days) / sizeof(*days)) >= day) {
+        days[day - 1](argv[2]);
+    } else {
+        std::cout << "Day not implemented" << std::endl;
+        return 1;
+    }
 
     return 0;
 }
