@@ -1,12 +1,16 @@
 #include "../common/int_vector2.h"
+#include <atomic>
 #include <bitset>
 #include <cassert>
+#include <cmath>
 #include <fstream>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 namespace {
 using std::size_t;
+using std::thread;
 using std::vector;
 
 // ^ > V <
@@ -34,6 +38,8 @@ public:
     }
 
     void set_visited() { state.set(VISITED); }
+
+    void set_unvisited() { state &= ~0b11111ULL; }
 
     bool is_visited() const { return state.test(VISITED); }
 
@@ -101,7 +107,7 @@ bool in_bounds(const IntVector2& pos, const Map& input)
         && pos.y < static_cast<int>(input.size());
 }
 
-void part_1(Map input, IntVector2 guard_pos)
+Map part_1(Map input, IntVector2 guard_pos)
 {
     int dir_index { 0 };
     int visited { 0 };
@@ -129,13 +135,13 @@ void part_1(Map input, IntVector2 guard_pos)
     }
 
     std::cout << "Result: " << visited << std::endl;
+
+    return input;
 }
 
-bool has_loop(Map input, IntVector2 guard_pos, IntVector2 wall_pos)
+bool has_loop(Map& input, IntVector2 guard_pos)
 {
     size_t dir_index { 0 };
-    input[static_cast<size_t>(wall_pos.y)][static_cast<size_t>(wall_pos.x)]
-        .set_wall(true);
 
     while (true) {
         auto next_pos = guard_pos + directions[dir_index];
@@ -159,28 +165,69 @@ bool has_loop(Map input, IntVector2 guard_pos, IntVector2 wall_pos)
     return false;
 }
 
-void part_2(Map input, IntVector2 guard_pos)
+void clean_map(Map& input)
+{
+    for (auto& row : input) {
+        for (auto& tile : row) {
+            tile.set_unvisited();
+        }
+    }
+}
+
+void work(Map input, IntVector2 guard_pos, std::atomic<int>& total_result,
+    vector<IntVector2> wallPositions, size_t start, size_t end)
 {
     int total { 0 };
-    std::cout << has_loop(input, guard_pos, IntVector2(0, 0));
-    for (size_t x = 0; x < input[0].size(); x++) {
-        std::cout << "\r"
-                  << (static_cast<float>(x) / static_cast<float>(input.size())
-                         * 100)
-                  << "%" << std::flush;
+    for (size_t i = start; i < end; i++) {
+        IntVector2 wall_pos = wallPositions[i];
+        input[static_cast<size_t>(wall_pos.y)][static_cast<size_t>(wall_pos.x)]
+            .set_wall(true);
+        if (has_loop(input, guard_pos)) {
+            total++;
+        }
+        clean_map(input);
+        input[static_cast<size_t>(wall_pos.y)][static_cast<size_t>(wall_pos.x)]
+            .set_wall(false);
+    }
+
+    total_result += total;
+}
+
+void part_2(Map input, IntVector2 guard_pos, Map visited_input)
+{
+    const int numThreads = 6;
+    vector<thread> threads;
+    std::atomic<int> total { 0 };
+
+    vector<IntVector2> wall_positions;
+    for (size_t x = 0; x < input.size(); x++) {
         for (size_t y = 0; y < input.size(); y++) {
-            if (input[y][x].is_wall()) {
+            if (!visited_input[y][x].is_visited()) {
                 continue;
             }
 
-            if (has_loop(input, guard_pos,
-                    IntVector2(static_cast<int>(x), static_cast<int>(y)))) {
-                total++;
-            }
+            wall_positions.push_back(
+                IntVector2(static_cast<int>(x), static_cast<int>(y)));
         }
     }
 
-    std::cout << "\rResult: " << total << std::endl;
+    size_t total_work = wall_positions.size();
+    size_t chunk_size = static_cast<size_t>(std::round(
+        static_cast<float>(total_work) / static_cast<float>(numThreads)));
+
+    for (size_t i = 0; i < numThreads; i++) {
+        size_t start = i * chunk_size;
+        size_t end = std::min((i + 1) * chunk_size, total_work);
+
+        threads.push_back(thread(work, input, guard_pos, std::ref(total),
+            wall_positions, start, end));
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    std::cout << "Result: " << total << std::endl;
 }
 }
 
@@ -192,6 +239,6 @@ void day_06(const char* input_file)
     IntVector2 guard_pos = IntVector2(0, 0);
     read_input(input_file, input, guard_pos);
 
-    part_1(input, guard_pos);
-    part_2(input, guard_pos);
+    Map visited_input = part_1(input, guard_pos);
+    part_2(input, guard_pos, visited_input);
 }

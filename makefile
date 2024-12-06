@@ -1,5 +1,5 @@
 CXX := clang++
-CXXFLAGS := -std=c++20 -Wall -Weffc++ -Wconversion -Wsign-conversion -Wextra -pedantic-errors -g
+CXXFLAGS := -std=c++20 -Wall -Weffc++ -Wconversion -Wsign-conversion -Wextra -pedantic-errors -g -Ofast
 
 TARGET := aoc2024
 
