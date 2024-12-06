@@ -3,11 +3,12 @@
 #include "day_03/day_03.h"
 #include "day_04/day_04.h"
 #include "day_05/day_05.h"
+#include "day_06/day_06.h"
 
 #include <cstdlib>
 #include <iostream>
 
-void (*const days[])(const char*) = { day_01, day_02, day_03, day_04, day_05 };
+void (*const days[])(const char*) = { day_01, day_02, day_03, day_04, day_05, day_06 };
 
 int main(int argc, char* argv[])
 {
