@@ -12,12 +12,14 @@
 #include "day_12/day_12.h"
 #include "day_13/day_13.h"
 #include "day_14/day_14.h"
+#include "day_15/day_15.h"
 
 #include <cstdlib>
 #include <iostream>
 
-void (*const days[])(const char*) = { day_01, day_02, day_03, day_04, day_05,
-    day_06, day_07, day_08, day_09, day_10, day_11, day_12, day_13, day_14 };
+void (*const days[])(const char*)
+    = { day_01, day_02, day_03, day_04, day_05, day_06, day_07, day_08, day_09,
+          day_10, day_11, day_12, day_13, day_14, day_15 };
 
 int main(int argc, char* argv[])
 {

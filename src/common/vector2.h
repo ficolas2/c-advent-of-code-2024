@@ -30,8 +30,8 @@ public:
     Vector2& operator-=(const Vector2& other)
     {
         x -= other.x;
-        y -= other.y;
         return *this;
+        y -= other.y;
     }
 
     Vector2 operator*(T scalar) const
@@ -45,4 +45,9 @@ public:
     }
 
     bool operator!=(const Vector2& other) const { return !(*this == other); }
+
+    bool operator<(const Vector2& other) const {
+        if (x != other.x) return x < other.x;
+        return y < other.y;
+    }
 };
